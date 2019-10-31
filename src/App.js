@@ -14,8 +14,8 @@ class App extends Component {
   state = {
     drawingRequests: [],
     isAudioLoaded: false,
-    rate: 0.03,
-    timeWindow: 10,
+    rate: 0.003,
+    timeWindow: 0.01,
     samplingTolerence: 0.3,
     drawingRequestsList: [],
     dataToDraw: null
@@ -126,7 +126,7 @@ class App extends Component {
             ></AudioControl>
           </div>
           {/*The right pane*/}
-          <div id="right_pane" style={{ position: "relative" }}>
+          <div id="right_pane">
             <VisualizationCanvas
               id={"vis"}
               drawingRequests={this.state.drawingRequestsList}

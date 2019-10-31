@@ -2,8 +2,11 @@ import React from "react";
 import LineChart from "../components/lineChart";
 import Heatmap from "../components/heatmap";
 import AppContext from "../AppContext";
-import { LineChartOverview } from "../components/lineChartOverview";
+import OverviewLineChart from "../components/OverviewLineChart";
 import LineChartCanvas from "./lineChartCanvas";
+
+var height = 250;
+var overviewHeight = 150;
 
 function Chart(props) {
   let { drawingRequest, data } = props;
@@ -12,8 +15,26 @@ function Chart(props) {
     chart = (
       <AppContext.Consumer>
         {() => (
-          <div>
-            <LineChartCanvas key={props.id} data={data} idx={props.idx} />
+          <div
+            id="linechart_pairs"
+            style={{
+              position: "relative",
+              display: "flex",
+              flexDirection: "column"
+            }}
+          >
+            <LineChartCanvas
+              key={props.id}
+              data={data}
+              idx={props.idx}
+              oh={overviewHeight}
+            />
+            <OverviewLineChart
+              key={props.id}
+              dataBatch={props.dataBatch}
+              idx={props.idx}
+              hp={height}
+            ></OverviewLineChart>
           </div>
         )}
       </AppContext.Consumer>

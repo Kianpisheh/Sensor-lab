@@ -1,6 +1,7 @@
 import React from "react";
 import Chart from "../components/chart";
 
+var height = 250;
 function VisualizationCanvas(props) {
   if (props.data === null) {
     return null;

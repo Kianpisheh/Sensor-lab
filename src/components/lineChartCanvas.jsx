@@ -43,7 +43,7 @@ class LineChartCanvas extends Component {
       .range([height - margin.bottom, margin.top]);
 
     // tick size
-    this.timeTickSize = 30 * context.rate;
+    this.timeTickSize = context.timeWindow / 10;
     this.valueTickSize = 2;
 
     // method binding :(
@@ -60,8 +60,6 @@ class LineChartCanvas extends Component {
       // acquire and scale the data point
       const point = this.getCoordinates(this.props.data);
 
-      console.log(this.props.idx + " " + point);
-
       if (this.axesContext && this.canvasContext) {
         this.drawLine(point);
         this.drawTimeAxis(point[0]);
@@ -72,17 +70,22 @@ class LineChartCanvas extends Component {
     }
 
     return (
-      <div key={this.props.key}>
+      <div
+        id="linechart_canvases"
+        style={{ position: "relative" }}
+        key={this.props.key}
+      >
         <canvas
           id="layer1"
           ref={"axesAndGridCanvas"}
           width="500"
           height="250"
           style={{
+            backgroundColor: "transparent",
             position: "absolute",
             zIndex: 0,
             left: 0,
-            top: height * this.props.idx
+            top: this.props.idx * height + this.props.idx * this.props.oh
           }}
         ></canvas>
         <canvas
@@ -91,10 +94,11 @@ class LineChartCanvas extends Component {
           width="500"
           height="250"
           style={{
+            backgroundColor: "transparent",
             position: "absolute",
             zIndex: 1,
             left: 0,
-            top: height * this.props.idx
+            top: this.props.idx * height + this.props.idx * this.props.oh
           }}
         ></canvas>
       </div>

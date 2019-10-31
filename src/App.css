@@ -15,9 +15,10 @@
 }
 
 #right_pane {
+  overflow: hidden;
   display: flex;
   padding: 10px;
-  width: max-content;
+  width: 500px;
   flex-direction: column;
   flex-basis: 100%;
 }
