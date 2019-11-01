@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import LineChart from "../components/lineChart";
 import Heatmap from "../components/heatmap";
 import AppContext from "../AppContext";
@@ -9,6 +9,7 @@ var height = 250;
 var overviewHeight = 150;
 
 function Chart(props) {
+  const context = useContext(AppContext);
   let { drawingRequest, data } = props;
   let chart = null;
   if (drawingRequest.type === "line_chart") {
@@ -31,8 +32,8 @@ function Chart(props) {
             />
             <OverviewLineChart
               key={props.id}
-              dataBatch={props.dataBatch}
               idx={props.idx}
+              drawingRequest={props.drawingRequest}
               hp={height}
             ></OverviewLineChart>
           </div>

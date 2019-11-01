@@ -56,7 +56,7 @@ class LineChartCanvas extends Component {
   }
 
   render() {
-    if (this.props.data !== null) {
+    if (this.props.data !== null && this.props.data !== undefined) {
       // acquire and scale the data point
       const point = this.getCoordinates(this.props.data);
 

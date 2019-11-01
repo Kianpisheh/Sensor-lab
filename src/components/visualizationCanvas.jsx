@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import Chart from "../components/chart";
+import AppConstext from "../AppContext";
 
 var height = 250;
 function VisualizationCanvas(props) {
+  const context = useContext(AppConstext);
+
   if (props.data === null) {
     return null;
   }
-  return props.drawingRequests.map((drawingRequest, i) => (
+
+  return context.drawingRequestsList.map((drawingRequest, i) => (
     <Chart
       key={drawingRequest.id}
       idx={i}

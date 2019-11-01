@@ -12,13 +12,13 @@ import DrawingRequestManager from "./DrawingRequestManager";
 
 class App extends Component {
   state = {
-    drawingRequests: [],
     isAudioLoaded: false,
-    rate: 0.003,
-    timeWindow: 0.01,
+    rate: 0.03,
+    timeWindow: 10,
     samplingTolerence: 0.3,
     drawingRequestsList: [],
-    dataToDraw: null
+    dataToDraw: null,
+    dataBatch: null
   };
   constructor(props) {
     super(props);
@@ -46,7 +46,8 @@ class App extends Component {
     );
     this.setState({
       drawingRequestsList: initialDrawingRequest,
-      isAudioLoaded: true
+      isAudioLoaded: true,
+      dataBatch: this.dataManager.data
     });
   }
 
@@ -92,6 +93,8 @@ class App extends Component {
       newIndeces
     );
 
+    console.log(newSamples);
+
     this.setState({
       drawingRequestsList: updatedDrawingRequest,
       dataToDraw: newSamples
@@ -127,11 +130,7 @@ class App extends Component {
           </div>
           {/*The right pane*/}
           <div id="right_pane">
-            <VisualizationCanvas
-              id={"vis"}
-              drawingRequests={this.state.drawingRequestsList}
-              data={this.state.dataToDraw}
-            />
+            <VisualizationCanvas id={"vis"} data={this.state.dataToDraw} />
           </div>
         </div>
       </AppConstext.Provider>
