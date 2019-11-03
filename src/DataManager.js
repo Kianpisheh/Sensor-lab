@@ -10,6 +10,7 @@ class DataManager {
     this.onDataLoaded = onDataLoaded;
     this.audioSampleRate = 22050;
     this.loaded = [];
+    this.aduio = null;
     this.parser = null;
   }
 
@@ -18,6 +19,7 @@ class DataManager {
       if (targetFiles[i].name.endsWith(".wav")) {
         this._load_raw_audio(targetFiles[i], targetFiles.length);
         this.audioURL = URL.createObjectURL(targetFiles[i]);
+        this.audio = new Audio(URL.createObjectURL(targetFiles[i]));
         continue;
       } else {
         this._laod_csv(targetFiles[i], targetFiles.length);

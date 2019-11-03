@@ -105,6 +105,8 @@ class LineChartCanvas extends Component {
     );
   }
 
+  // darwing methods
+
   drawLine(point) {
     // find the shift step
     let a =

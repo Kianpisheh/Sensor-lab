@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import LineChart from "../components/lineChart";
+import React from "react";
 import Heatmap from "../components/heatmap";
 import AppContext from "../AppContext";
 import OverviewLineChart from "../components/OverviewLineChart";
@@ -9,21 +8,13 @@ var height = 250;
 var overviewHeight = 150;
 
 function Chart(props) {
-  const context = useContext(AppContext);
   let { drawingRequest, data } = props;
   let chart = null;
   if (drawingRequest.type === "line_chart") {
     chart = (
       <AppContext.Consumer>
         {() => (
-          <div
-            id="linechart_pairs"
-            style={{
-              position: "relative",
-              display: "flex",
-              flexDirection: "column"
-            }}
-          >
+          <div id="linechart_pairs">
             <LineChartCanvas
               key={props.id}
               data={data}

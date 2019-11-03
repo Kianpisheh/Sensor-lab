@@ -6,10 +6,9 @@ export default () => {
     // TODO: make it a global variable (take it from the app thread)
     const margin = { top: 20, right: 10, bottom: 20, left: 30 };
 
-    console.log(data);
     // setup the offscreen canvas
-    let canvas = new OffscreenCanvas(width, height);
-    let canvasContext = canvas.getContext("2d");
+    var canvas = new OffscreenCanvas(width, height);
+    var canvasContext = canvas.getContext("2d");
     canvasContext.lineWidth = 1;
 
     // draw the path (line chart)
@@ -40,7 +39,6 @@ export default () => {
     }
     canvasContext.stroke();
     canvasContext.closePath();
-    console.log("hello from worker thread");
 
     // send the result into the main thread (OverviewLineChart.jsx)
     postMessage(canvasContext.getImageData(0, 0, width, height));

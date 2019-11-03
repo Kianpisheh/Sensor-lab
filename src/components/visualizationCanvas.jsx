@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import Chart from "../components/chart";
+import Chart from "./chart";
 import AppConstext from "../AppContext";
 
 var height = 250;

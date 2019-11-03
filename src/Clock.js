@@ -8,6 +8,7 @@ class ClocK {
 
   setAudio(audio) {
     this.audio = audio;
+    console.log(this.audio);
   }
 
   start() {
@@ -25,8 +26,8 @@ class ClocK {
   }
 
   // not sure if it is necessary
-  setTime() {
-    this.time = this.audio.currentTime * 1000;
+  setTime(value) {
+    this.time = value * 1000;
   }
 
   onTick() {

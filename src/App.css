@@ -34,5 +34,9 @@
 }
 
 #sensor_selector_div {
-  display: inline-block;
+  display: flex;
+}
+
+#overview_time_window_slider {
+  padding: 10px;
 }

@@ -3,21 +3,25 @@ import "./App.css";
 import DataImport from "./components/dataImport";
 import FeatureSelection from "./components/featureSelection";
 import DataManager from "./DataManager";
-import DrawingManager from "./DrawingManager";
 import VisualizationCanvas from "./components/visualizationCanvas";
 import Clock from "./Clock";
 import AppConstext from "./AppContext";
 import AudioControl from "./components/audioControl";
 import DrawingRequestManager from "./DrawingRequestManager";
+import TimingSettings from "./components/timingSettings";
 
 class App extends Component {
   state = {
     isAudioLoaded: false,
     rate: 0.03,
-    timeWindow: 10,
+    isPlaying: false,
+    timeWindow: 10, // seconds
+    overviewTimeWindow: 800, //
     samplingTolerence: 0.3,
     drawingRequestsList: [],
+    isDataLoaded: false,
     dataToDraw: null,
+    audioSR: null,
     dataBatch: null
   };
   constructor(props) {
@@ -31,7 +35,8 @@ class App extends Component {
     this.onNextTimestamp = this.onNextTimestamp.bind(this);
     this.onAddButtonClicked = this.onAddButtonClicked.bind(this);
     this.onRemoveButtonClicked = this.onRemoveButtonClicked.bind(this);
-    this.onTimeChangedByUser = this.onTimeChangedByUser.bind(this);
+    this.onTimeSettingsChange = this.onTimeSettingsChange.bind(this);
+    this.handleAudioEvent = this.handleAudioEvent.bind(this);
 
     this.dataManager = new DataManager(this.handleDataLoaded);
     this.clock = new Clock(this.state.rate, this.onNextTimestamp);
@@ -44,11 +49,33 @@ class App extends Component {
     initialDrawingRequest.push(
       DrawingRequestManager.createInitialDrawingRequest(this.dataManager.data)
     );
+    this.audio = this.dataManager.audio;
     this.setState({
       drawingRequestsList: initialDrawingRequest,
       isAudioLoaded: true,
-      dataBatch: this.dataManager.data
+      dataBatch: this.dataManager.data,
+      audioSR: this.dataManager.audioSampleRate,
+      isDataLoaded: true
     });
+  }
+
+  setAudio(source) {
+    return (
+      <audio
+        ref={ref => (this.audio = ref)}
+        onPlay={this.handleAudioEvent("audio_played", null)}
+        onPause={this.handleAudioEvent("audio_paused", null)}
+        onSeeked={() => this.handleAudioEvent("seeked", this.audio.currentTime)}
+        onTimeUpdate={() =>
+          this.handleAudioEvent("time_updated", this.audio.currentTime)
+        }
+        controls
+        src={source}
+      >
+        Your browser does not support the
+        <code>audio</code> element.
+      </audio>
+    );
   }
 
   // feature selection event handlers
@@ -93,19 +120,46 @@ class App extends Component {
       newIndeces
     );
 
-    console.log(newSamples);
-
     this.setState({
       drawingRequestsList: updatedDrawingRequest,
       dataToDraw: newSamples
     });
   }
 
-  onTimeChangedByUser(timestamp) {
-    const drawingRequestsList = DrawingRequestManager.resetIndex(
-      this.state.drawingRequestsList
-    );
-    this.setState({ drawingRequestsList });
+  onTimeSettingsChange(parameter, value) {
+    // value is in minutes
+    if (parameter === "overview_time_window") {
+      this.setState({ overviewTimeWindow: value * 60 });
+    }
+  }
+
+  handleAudioEvent(eventType, value) {
+    switch (eventType) {
+      case "play_button_clicked":
+        if (this.state.isPlaying) {
+          this.audio.pause();
+          this.clock.pause();
+          this.setState({ isPlaying: false });
+        } else {
+          this.clock.setAudio(this.audio);
+          this.clock.start();
+          this.audio.play();
+          this.setState({ isPlaying: true });
+        }
+        break;
+      case "time_updated":
+        this.clock.setTime(value);
+        break;
+      case "time_changed_by_user":
+        this.audio.currentTime = value;
+        const drawingRequestsList = DrawingRequestManager.resetIndex(
+          this.state.drawingRequestsList
+        );
+        this.setState({ drawingRequestsList });
+        break;
+      default:
+        console.log("no matched event to handle");
+    }
   }
 
   render() {
@@ -121,11 +175,14 @@ class App extends Component {
               onAddButtonClicked={this.onAddButtonClicked}
               onRemoveButtonClicked={this.onRemoveButtonClicked}
             />
+            <TimingSettings
+              isDataLoaded={this.state.isDataLoaded}
+              onTimeSettingsChange={this.onTimeSettingsChange}
+            ></TimingSettings>
             <AudioControl
-              source={this.dataManager.audioURL}
-              isAudioLoaded={this.state.isAudioLoaded}
-              onNextTimestamp={this.onNextTimestamp}
-              onSeeked={this.onTimeChangedByUser}
+              audio={this.audio}
+              isAudioPlaying={this.state.isPlaying}
+              eventHandler={this.handleAudioEvent}
             ></AudioControl>
           </div>
           {/*The right pane*/}

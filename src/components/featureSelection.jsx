@@ -1,5 +1,8 @@
 import React from "react";
 import AppContext from "../AppContext";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 
 function FeatureSelection(props) {
   return (
@@ -91,6 +94,75 @@ function FeatureSelector(props) {
         </option>
       ))}
     </select>
+  );
+}
+
+function SensorSelector2(props) {
+  return (
+    <div>
+      <InputLabel
+        style={{ fontSize: "14px" }}
+        className="feature_selectors"
+        id="feature_selector_label"
+        key={props.sensor + props.id}
+      >
+        Sensor
+      </InputLabel>
+      <Select
+        className="sensor_selectors"
+        key={props.sesnor + props.id}
+        value={props.sensor}
+        style={{ fontSize: "12px" }}
+        onChange={event => {
+          props.onSelectorChanged(event.target.value, props.id, true);
+        }}
+      >
+        {Object.keys(props.sensorFeatureList).map(sensor => (
+          <MenuItem
+            key={sensor + props.id}
+            id={props.id}
+            value={sensor}
+            style={{ fontSize: "12px" }}
+          >
+            {sensor}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
+  );
+}
+
+function FeatureSelector2(props) {
+  return (
+    <div>
+      <InputLabel
+        style={{ fontSize: "14px" }}
+        className="feature_selectors"
+        id="feature_selector_label"
+        key={props.feature + props.id}
+      >
+        Feature
+      </InputLabel>
+      <Select
+        id="feature_selector"
+        labelId="feature_selector_label"
+        style={{ fontSize: "12px" }}
+        onChange={event => {
+          props.onSelectorChanged(event.target.value, props.id, false);
+        }}
+      >
+        {props.sensorFeatureList[props.sensor].map(feature => (
+          <MenuItem
+            key={feature + props.id}
+            id={props.id}
+            value={feature}
+            style={{ fontSize: "12px" }}
+          >
+            {feature}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
   );
 }
 
