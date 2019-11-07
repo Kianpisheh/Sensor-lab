@@ -24,6 +24,7 @@ function Chart(props) {
             <OverviewLineChart
               key={props.id}
               idx={props.idx}
+              currentTime={data.timestamp}
               drawingRequest={props.drawingRequest}
               hp={height}
             ></OverviewLineChart>

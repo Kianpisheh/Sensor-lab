@@ -8,7 +8,7 @@ import Clock from "./Clock";
 import AppConstext from "./AppContext";
 import AudioControl from "./components/audioControl";
 import DrawingRequestManager from "./DrawingRequestManager";
-import TimingSettings from "./components/timingSettings";
+import OvervieSettings from "./components/OverviewSettings";
 
 class App extends Component {
   state = {
@@ -16,7 +16,8 @@ class App extends Component {
     rate: 0.03,
     isPlaying: false,
     timeWindow: 10, // seconds
-    overviewTimeWindow: 800, //
+    overviewTimeWindow: 800, // seconds
+    overviewCurrTime: 0,
     samplingTolerence: 0.3,
     drawingRequestsList: [],
     isDataLoaded: false,
@@ -35,7 +36,7 @@ class App extends Component {
     this.onNextTimestamp = this.onNextTimestamp.bind(this);
     this.onAddButtonClicked = this.onAddButtonClicked.bind(this);
     this.onRemoveButtonClicked = this.onRemoveButtonClicked.bind(this);
-    this.onTimeSettingsChange = this.onTimeSettingsChange.bind(this);
+    this.onOverviewSettingsChange = this.onOverviewSettingsChange.bind(this);
     this.handleAudioEvent = this.handleAudioEvent.bind(this);
 
     this.dataManager = new DataManager(this.handleDataLoaded);
@@ -126,10 +127,12 @@ class App extends Component {
     });
   }
 
-  onTimeSettingsChange(parameter, value) {
+  onOverviewSettingsChange(parameter, value) {
     // value is in minutes
     if (parameter === "overview_time_window") {
       this.setState({ overviewTimeWindow: value * 60 });
+    } else if (parameter === "overview_time") {
+      this.setState({ overviewCurrTime: value });
     }
   }
 
@@ -175,10 +178,10 @@ class App extends Component {
               onAddButtonClicked={this.onAddButtonClicked}
               onRemoveButtonClicked={this.onRemoveButtonClicked}
             />
-            <TimingSettings
+            <OvervieSettings
               isDataLoaded={this.state.isDataLoaded}
-              onTimeSettingsChange={this.onTimeSettingsChange}
-            ></TimingSettings>
+              onOverviewSettingsChange={this.onOverviewSettingsChange}
+            ></OvervieSettings>
             <AudioControl
               audio={this.audio}
               isAudioPlaying={this.state.isPlaying}
