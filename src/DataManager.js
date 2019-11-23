@@ -10,7 +10,7 @@ class DataManager {
     this.onDataLoaded = onDataLoaded;
     this.audioSampleRate = 22050;
     this.loaded = [];
-    this.aduio = null;
+    this.audio = null;
     this.parser = null;
   }
 

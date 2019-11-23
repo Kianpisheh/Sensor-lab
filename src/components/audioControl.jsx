@@ -1,9 +1,12 @@
-import React, { Component, useState } from "react";
+import React, { Component, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
+import AppConstext from "../AppContext";
 
 export default function(props) {
+  const context = useContext(AppConstext);
+
   let buttonIcon = null;
   if (props.isAudioPlaying) {
     // setp the play button
@@ -40,6 +43,14 @@ export default function(props) {
   if (props.audio !== null && props.audio !== undefined) {
     value = Math.floor(props.audio.currentTime);
     max = props.audio.duration;
+  } else {
+    value = Math.floor(props.clockTime);
+    if (context.drawingRequestsList[0] !== undefined) {
+      const h = context.drawingRequestsList[0].sensor;
+      const time = context.dataBatch[h].timestamp;
+      max = time[time.length - 1];
+    }
+    max = 100;
   }
 
   return (
@@ -56,8 +67,8 @@ export default function(props) {
         step={1}
         min={0}
         max={max}
-        onChangeCommitted={(event, value) =>
-          props.eventHandler("time_changed_by_user", value)
+        onChangeCommitted={(event, val) =>
+          props.eventHandler("time_changed_by_user", val)
         }
       />
       <span style={{ marginLeft: "10px", fontSize: "11px" }}>

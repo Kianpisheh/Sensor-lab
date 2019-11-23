@@ -24,7 +24,7 @@ class Heatmap extends Component {
 
     this.numSamples = this.props.dataToDraw.length;
 
-    this.numFeatures = this.props.dataToDraw[0].value.length;
+    this.numFeatures = this.props.dataToDraw.value[0].length;
     this.data = new Array(this.numSamples).fill(
       new Array(this.numFeatures).fill(null)
     );
@@ -63,7 +63,7 @@ class Heatmap extends Component {
   updateDrawingTools() {
     this.numSamples = this.props.dataToDraw.length;
 
-    this.numFeatures = this.props.dataToDraw[0].value.length;
+    this.numFeatures = this.props.dataToDraw.value[0].length;
     this.data = new Array(this.numSamples).fill(
       new Array(this.numFeatures).fill(null)
     );
@@ -83,7 +83,9 @@ class Heatmap extends Component {
 
     this.colorScale = d3.scaleSequential(d3.interpolateViridis);
 
-    const domain = this.props.ylim;
+    //const domain = this.props.ylim;
+    // TODO: domain from the input data
+    const domain = [-20, 20];
 
     if (this.logScale) {
       this.colorScale.domain([

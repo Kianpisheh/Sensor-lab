@@ -22,7 +22,7 @@ export default () => {
           (timestamps[i] / (timeWindow * 1000)) *
             (width - margin.right - margin.left) +
             margin.left,
-          ((data[i] + 10) / 20) * (-height + margin.top - margin.bottom) +
+          ((data[i] + 40) / 80) * (-height + margin.top - margin.bottom) +
             height -
             margin.bottom
         );
@@ -31,7 +31,7 @@ export default () => {
           (timestamps[i] / (timeWindow * 1000)) *
             (width - margin.right - margin.left) +
             margin.left,
-          ((data[i] + 10) / 20) * (-height + margin.top - margin.bottom) +
+          ((data[i] + 40) / 80) * (-height + margin.top - margin.bottom) +
             height -
             margin.bottom
         );

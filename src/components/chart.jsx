@@ -38,9 +38,8 @@ function Chart(props) {
         {props => (
           <Heatmap
             key={props.id}
-            dataToDraw={drawingRequest.buffer}
+            dataToDraw={data}
             ylim={drawingRequest.featureRange}
-            numFeatures={drawingRequest.buffer[0].value.length}
           />
         )}
       </AppContext.Consumer>

@@ -39,7 +39,7 @@ class LineChartCanvas extends Component {
       .range([margin.left, width - margin.right]);
     this.yScale = d3
       .scaleLinear()
-      .domain([-5, 5])
+      .domain([-35, 35])
       .range([height - margin.bottom, margin.top]);
 
     // tick size

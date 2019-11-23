@@ -8,7 +8,7 @@ import Clock from "./Clock";
 import AppConstext from "./AppContext";
 import AudioControl from "./components/audioControl";
 import DrawingRequestManager from "./DrawingRequestManager";
-import OvervieSettings from "./components/OverviewSettings";
+import OverviewSettings from "./components/OverviewSettings";
 
 class App extends Component {
   state = {
@@ -27,6 +27,7 @@ class App extends Component {
   };
   constructor(props) {
     super(props);
+    this.audio = null;
 
     this.numSamples = Math.floor(this.state.timeWindow / this.state.rate);
 
@@ -50,6 +51,7 @@ class App extends Component {
     initialDrawingRequest.push(
       DrawingRequestManager.createInitialDrawingRequest(this.dataManager.data)
     );
+    console.log(this.dataManager.data);
     this.audio = this.dataManager.audio;
     this.setState({
       drawingRequestsList: initialDrawingRequest,
@@ -140,13 +142,17 @@ class App extends Component {
     switch (eventType) {
       case "play_button_clicked":
         if (this.state.isPlaying) {
-          this.audio.pause();
+          if (this.audio !== null) {
+            this.audio.pause();
+          }
           this.clock.pause();
           this.setState({ isPlaying: false });
         } else {
           this.clock.setAudio(this.audio);
           this.clock.start();
-          this.audio.play();
+          if (this.audio !== null) {
+            this.audio.play();
+          }
           this.setState({ isPlaying: true });
         }
         break;
@@ -154,7 +160,13 @@ class App extends Component {
         this.clock.setTime(value);
         break;
       case "time_changed_by_user":
-        this.audio.currentTime = value;
+        if (this.audio !== null) {
+          this.audio.currentTime = value;
+          console.log(value);
+        } else {
+          console.log(value);
+          this.clock.time = value * 1000;
+        }
         const drawingRequestsList = DrawingRequestManager.resetIndex(
           this.state.drawingRequestsList
         );
@@ -178,12 +190,13 @@ class App extends Component {
               onAddButtonClicked={this.onAddButtonClicked}
               onRemoveButtonClicked={this.onRemoveButtonClicked}
             />
-            <OvervieSettings
+            <OverviewSettings
               isDataLoaded={this.state.isDataLoaded}
               onOverviewSettingsChange={this.onOverviewSettingsChange}
-            ></OvervieSettings>
+            ></OverviewSettings>
             <AudioControl
               audio={this.audio}
+              clockTime={Math.floor(this.clock.time / 1000)}
               isAudioPlaying={this.state.isPlaying}
               eventHandler={this.handleAudioEvent}
             ></AudioControl>

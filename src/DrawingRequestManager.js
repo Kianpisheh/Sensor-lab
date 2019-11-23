@@ -13,6 +13,7 @@ class DrawingRequestManager {
   }
 
   static updateDrawingRequest(currentRequestsList, value, id, sensorChanged) {
+    console.log("curr", currentRequestsList);
     let updatedRequestsList = [];
     currentRequestsList.forEach(drawingRequest => {
       if (drawingRequest.id === id) {
