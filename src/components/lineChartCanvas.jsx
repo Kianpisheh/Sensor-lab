@@ -31,6 +31,7 @@ class LineChartCanvas extends Component {
     this.canvasContext = null;
     this.prevPoint = null;
     this.sample_num = 1;
+    this.data = null;
 
     // setup scales
     this.xScale = d3
@@ -56,9 +57,12 @@ class LineChartCanvas extends Component {
   }
 
   render() {
-    if (this.props.data !== null && this.props.data !== undefined) {
+    if (this.props.dataToDraw !== null && this.props.dataToDraw !== undefined) {
+      this.data = this.props.dataToDraw[this.props.reqId];
+    }
+    if (this.data !== null && this.data !== undefined) {
       // acquire and scale the data point
-      const point = this.getCoordinates(this.props.data);
+      const point = this.getCoordinates(this.data);
 
       if (this.axesContext && this.canvasContext) {
         this.drawLine(point);
@@ -70,35 +74,26 @@ class LineChartCanvas extends Component {
     }
 
     return (
-      <div
-        id="linechart_canvases"
-        style={{ position: "relative" }}
-        key={this.props.key}
-      >
+      <div id="linechart_canvases">
         <canvas
           id="layer1"
           ref={"axesAndGridCanvas"}
-          width="500"
-          height="250"
+          width={width}
+          height={height}
           style={{
             backgroundColor: "transparent",
             position: "absolute",
-            zIndex: 0,
-            left: 0,
-            top: this.props.idx * height + this.props.idx * this.props.oh
+            zIndex: 0
           }}
         ></canvas>
         <canvas
           id="layer2"
           ref={"canvas"}
-          width="500"
-          height="250"
+          width={width}
+          height={height}
           style={{
             backgroundColor: "transparent",
-            position: "absolute",
-            zIndex: 1,
-            left: 0,
-            top: this.props.idx * height + this.props.idx * this.props.oh
+            zIndex: 1
           }}
         ></canvas>
       </div>
@@ -106,7 +101,6 @@ class LineChartCanvas extends Component {
   }
 
   // darwing methods
-
   drawLine(point) {
     // find the shift step
     let a =

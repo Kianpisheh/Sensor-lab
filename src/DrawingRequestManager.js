@@ -1,7 +1,21 @@
 class DrawingRequestManager {
-  static createInitialDrawingRequest(loadedData) {
+  constructor() {
+    this.sensorFeatureList = null;
+
+    //method binding
+    this._createAudioFeatureList = this._createAudioFeatureList.bind(this);
+    this._createSensorFeatureList = this._createSensorFeatureList.bind(this);
+    this.updateDrawingRequest = this.updateDrawingRequest.bind(this);
+    this.updateIndeces = this.updateIndeces.bind(this);
+    this.createNewDrawingRequest = this.createNewDrawingRequest.bind(this);
+    this.createInitialDrawingRequest = this.createInitialDrawingRequest.bind(
+      this
+    );
+    this.removeDrawingRequest = this.removeDrawingRequest.bind(this);
+  }
+  createInitialDrawingRequest(loadedData) {
     const sensorFeatureList = this._createSensorFeatureList(loadedData);
-    DrawingRequestManager.sensorFeatureList = sensorFeatureList;
+    this.sensorFeatureList = sensorFeatureList;
     const sensor = Object.keys(sensorFeatureList)[0];
     const feature = sensorFeatureList[sensor][0];
     let type = "line_chart";
@@ -12,15 +26,13 @@ class DrawingRequestManager {
     return { id: 0, sensor: sensor, feature: feature, currIdx: 0, type: type };
   }
 
-  static updateDrawingRequest(currentRequestsList, value, id, sensorChanged) {
-    console.log("curr", currentRequestsList);
+  updateDrawingRequest(currentRequestsList, value, id, sensorChanged) {
     let updatedRequestsList = [];
     currentRequestsList.forEach(drawingRequest => {
       if (drawingRequest.id === id) {
         if (sensorChanged) {
           drawingRequest.sensor = value;
-          drawingRequest.feature =
-            DrawingRequestManager.sensorFeatureList[value][0];
+          drawingRequest.feature = this.sensorFeatureList[value][0];
           drawingRequest.currIdx = 0;
         } else {
           drawingRequest.feature = value;
@@ -40,7 +52,7 @@ class DrawingRequestManager {
     return updatedRequestsList;
   }
 
-  static updateIndeces(drawingRequestsList, newIndeces) {
+  updateIndeces(drawingRequestsList, newIndeces) {
     drawingRequestsList.forEach(drawingRequest => {
       if (newIndeces.hasOwnProperty(drawingRequest.id)) {
         drawingRequest.currIdx = newIndeces[drawingRequest.id];
@@ -49,8 +61,8 @@ class DrawingRequestManager {
     return drawingRequestsList;
   }
 
-  static createNewDrawingRequest(currentRequestsList, topId) {
-    const sensorName = Object.keys(DrawingRequestManager.sensorFeatureList)[0];
+  createNewDrawingRequest(currentRequestsList, topId) {
+    const sensorName = Object.keys(this.sensorFeatureList)[0];
     const featureName = this.sensorFeatureList[sensorName][0];
     let type = "line_chart";
     if (
@@ -81,7 +93,7 @@ class DrawingRequestManager {
     return currentRequestsList;
   }
 
-  static removeDrawingRequest(currentRequestsList, id) {
+  removeDrawingRequest(currentRequestsList, id) {
     // do not remove the last one
     if (currentRequestsList.length === 1) {
       return currentRequestsList;
@@ -94,7 +106,7 @@ class DrawingRequestManager {
     }
   }
 
-  static _createSensorFeatureList(data) {
+  _createSensorFeatureList(data) {
     let sfList = {};
     Object.keys(data).forEach(sensor => {
       if (sensor === "audio") {
@@ -116,7 +128,7 @@ class DrawingRequestManager {
     return sfList;
   }
 
-  static _createAudioFeatureList(audioFeatureList) {
+  _createAudioFeatureList(audioFeatureList) {
     let featureList = ["mfcc", "chroma", "fft"];
     audioFeatureList.forEach(feature => {
       if (
@@ -130,7 +142,7 @@ class DrawingRequestManager {
     return featureList;
   }
 
-  static resetIndex(drawingRequestsList) {
+  resetIndex(drawingRequestsList) {
     let updatedRequestList = [];
     drawingRequestsList.forEach(drawingRequest => {
       drawingRequest.currIdx = 0;

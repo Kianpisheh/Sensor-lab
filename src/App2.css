@@ -5,7 +5,23 @@
 }
 
 .chartpanel_container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  width: 500px;
+  margin: 15px;
+  display: flex;
+  flex-direction: column;
 
+}
+
+.chart_prop_tab {
+  display: flex;
+  flex-direction: row;
+}
+
+.select {
+  width: 200px;
+}
+
+
+.chart_canvas {
+  grid-row-start: 2;
 }
