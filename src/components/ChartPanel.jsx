@@ -1,28 +1,22 @@
 import React from "react";
 import Select from "react-select";
 import { ChartCanvas } from "./ChartCanvas";
+import NumericInput from "react-numeric-input";
+import NativeSelect from "@material-ui/core/NativeSelect";
 
 function ChartPanel(props) {
   const { sensor, feature, id } = props.drawingRequest;
 
   // get sensor list
   let sensorList = Object.keys(props.sensorsFeatureList);
-  sensorList = sensorList.map(element => {
-    var sensor = { value: element, label: element };
-    return sensor;
-  });
 
   // get feature list
   let featureList = props.sensorsFeatureList[sensor];
-  featureList = featureList.map(el => {
-    let feature = { value: el, label: el };
-    return feature;
-  });
 
   return (
     <div className="chartpanel_container">
       <div className="chart_prop_tab">
-        <Select
+        {/* <Select
           className="select"
           defaultValue={sensorList[0]}
           value={{ value: sensor, label: sensor }}
@@ -41,7 +35,36 @@ function ChartPanel(props) {
           onChange={event => {
             props.onFeatureSelectorChanged(event.value, id, false);
           }}
-        />
+        /> */}
+        <NativeSelect
+          key={id + "sensor"}
+          className="select"
+          value={props.sensor}
+          onChange={event => {
+            props.onFeatureSelectorChanged(event.target.value, id, true);
+          }}
+        >
+          {sensorList.map(sensor => (
+            <option key={sensor + id} value={sensor}>
+              {sensor}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          key={id + "feature"}
+          className="select"
+          value={props.feature}
+          onChange={event => {
+            props.onFeatureSelectorChanged(event.target.value, id, false);
+          }}
+        >
+          {featureList.map(feature => (
+            <option key={feature + id} value={feature}>
+              {feature}
+            </option>
+          ))}
+        </NativeSelect>
+        <NumericInput className="numper_input" min={0} max={100} value={50} />
       </div>
       <ChartCanvas
         className="chart_canvas"

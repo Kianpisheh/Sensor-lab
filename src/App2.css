@@ -18,7 +18,11 @@
 }
 
 .select {
-  width: 200px;
+  width: 180px;
+}
+
+.number_input {
+  width: 100px;
 }
 
 
