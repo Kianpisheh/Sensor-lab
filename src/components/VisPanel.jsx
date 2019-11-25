@@ -21,7 +21,8 @@ class VisPanel extends Component {
     isDataLoaded: false,
     dataToDraw: null,
     audioSR: null,
-    dataBatch: null
+    dataBatch: null,
+    dataRange: null
   };
 
   constructor(props) {
@@ -83,10 +84,15 @@ class VisPanel extends Component {
       )
     );
     this.audio = this.dataManager.audio;
+    let dataRange = this.dataManager.calcDataRange(
+      this.drawingRequestManager.sensorFeatureList
+    );
+    console.log(dataRange);
     this.setState({
       drawingRequestsList: initialDrawingRequest,
       isAudioLoaded: true,
       dataBatch: this.dataManager.data,
+      dataRange: dataRange,
       audioSR: this.dataManager.audioSampleRate,
       isDataLoaded: true
     });

@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import { objectToArray } from "./utility.js";
+import { objectToArray, calcfeatureRange } from "./utility.js";
 import { transformData, removeTimeOffset } from "./DataTransform.js";
 
 class DataManager {
@@ -25,6 +25,10 @@ class DataManager {
         this._laod_csv(targetFiles[i], targetFiles.length);
       }
     }
+  }
+
+  calcDataRange(sensorFeatureList) {
+    return calcfeatureRange(this.data, sensorFeatureList);
   }
 
   getSample(drawingRequests, timestamp, tolerence) {

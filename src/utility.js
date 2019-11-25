@@ -1,5 +1,6 @@
 function calcfeatureRange(data, sensorFeatureList) {
   let featureRange = {};
+  console.log(sensorFeatureList);
   Object.keys(data).forEach(sensor => {
     featureRange[sensor] = {};
     sensorFeatureList[sensor].forEach(feature => {
@@ -8,7 +9,9 @@ function calcfeatureRange(data, sensorFeatureList) {
         if (sensor === "audio") {
           range = [-0.5, 0.5];
         } else {
-          range = [-0.6, 0.6]; // range fro raw sensor data
+          let sub_data = _getSample(data[sensor][feature]); // a sub-sample of the whole array
+          range.push(Math.min.apply(null, sub_data));
+          range.push(Math.max.apply(null, sub_data));
         }
       } else {
         range.push(Math.min.apply(null, data[sensor][feature]));
@@ -18,6 +21,19 @@ function calcfeatureRange(data, sensorFeatureList) {
     });
   });
   return featureRange;
+}
+
+function _getSample(inputArray) {
+  let subSampleArray = [];
+  const sampleNum = 2000;
+  const sampleSize = 20;
+  const inputArraySize = inputArray.length;
+  for (let i = 0; i < sampleNum; i++) {
+    let idx = Math.floor(Math.random() * inputArraySize - sampleSize);
+    let sample = inputArray.slice(idx, idx + sampleSize);
+    subSampleArray.push(...sample);
+  }
+  return subSampleArray;
 }
 
 function objectToArray(featureRangeObj) {

@@ -16,26 +16,6 @@ function ChartPanel(props) {
   return (
     <div className="chartpanel_container">
       <div className="chart_prop_tab">
-        {/* <Select
-          className="select"
-          defaultValue={sensorList[0]}
-          value={{ value: sensor, label: sensor }}
-          name="color"
-          options={sensorList}
-          onChange={event => {
-            props.onFeatureSelectorChanged(event.value, id, true);
-          }}
-        />
-        <Select
-          className="select"
-          defaultValue={featureList[0]}
-          value={{ value: feature, label: feature }}
-          name="color"
-          options={featureList}
-          onChange={event => {
-            props.onFeatureSelectorChanged(event.value, id, false);
-          }}
-        /> */}
         <NativeSelect
           key={id + "sensor"}
           className="select"
@@ -64,7 +44,6 @@ function ChartPanel(props) {
             </option>
           ))}
         </NativeSelect>
-        <NumericInput className="numper_input" min={0} max={100} value={50} />
       </div>
       <ChartCanvas
         className="chart_canvas"

@@ -4,7 +4,7 @@ import AppContext from "../AppContext";
 
 const width = 500;
 const height = 250;
-const margin = { top: 20, right: 10, bottom: 20, left: 30 };
+const margin = { top: 20, right: 30, bottom: 20, left: 40 };
 
 function timeFormat(time) {
   let seconds = time % 60;
@@ -32,20 +32,19 @@ class LineChartCanvas extends Component {
     this.prevPoint = null;
     this.sample_num = 1;
     this.data = null;
+    this.dataRange = this.getRange(this.props.dataRange);
+    this.valueTickSize = this.getValueTickSize(this.props.dataRange);
 
     // setup scales
     this.xScale = d3
       .scaleLinear()
       .domain([0, context.timeWindow * 1000])
       .range([margin.left, width - margin.right]);
-    this.yScale = d3
-      .scaleLinear()
-      .domain([-35, 35])
-      .range([height - margin.bottom, margin.top]);
 
     // tick size
     this.timeTickSize = context.timeWindow / 10;
-    this.valueTickSize = 2;
+
+    console.log(this.valueTickSize);
 
     // method binding :(
     this.getCoordinates = this.getCoordinates.bind(this);
@@ -53,7 +52,46 @@ class LineChartCanvas extends Component {
     this.drawTimeAxis = this.drawTimeAxis.bind(this);
     this.drawValueAxis = this.drawValueAxis.bind(this);
     this.drawGrids = this.drawGrids.bind(this);
-    this.drawVerTick = this.drawVerTick.bind(this);
+    this.drawTick = this.drawTick.bind(this);
+    this.yScale2 = this.yScale2.bind(this);
+    this.yScaleInv = this.yScaleInv.bind(this);
+    this.getRange = this.getRange.bind(this);
+    this.getValueTickSize = this.getValueTickSize.bind(this);
+  }
+
+  getValueTickSize(dataRange) {
+    let tickSize = 5;
+    if (dataRange[0] !== dataRange[1]) {
+      tickSize = Math.floor((height - margin.top - margin.bottom) / 10);
+    }
+    return tickSize;
+  }
+
+  getRange(dataRange) {
+    let range = [];
+    if (dataRange[0] === dataRange[1]) {
+      range = [dataRange[0] - 1, dataRange[0] + 1];
+    } else {
+      range = dataRange;
+    }
+    return range;
+  }
+
+  yScale2(y) {
+    return (
+      height -
+      margin.bottom -
+      ((y - this.dataRange[0]) / (this.dataRange[1] - this.dataRange[0])) *
+        (height - margin.top - margin.bottom)
+    );
+  }
+
+  yScaleInv(p) {
+    return (
+      this.dataRange[0] +
+      (this.dataRange[1] - this.dataRange[0]) *
+        ((height - margin.bottom - p) / (height - margin.top - margin.bottom))
+    );
   }
 
   render() {
@@ -65,10 +103,10 @@ class LineChartCanvas extends Component {
       const point = this.getCoordinates(this.data);
 
       if (this.axesContext && this.canvasContext) {
-        this.drawLine(point);
         this.drawTimeAxis(point[0]);
         this.drawValueAxis();
         this.drawGrids();
+        this.drawLine(point);
       }
       this.prevPoint = point;
     }
@@ -131,9 +169,12 @@ class LineChartCanvas extends Component {
       this.canvasContext.beginPath();
       this.canvasContext.moveTo(
         width - margin.right - a,
-        this.yScale(this.prevPoint[1])
+        Math.round(this.yScale2(this.prevPoint[1]))
       );
-      this.canvasContext.lineTo(width - margin.right, this.yScale(point[1]));
+      this.canvasContext.lineTo(
+        width - margin.right,
+        Math.round(this.yScale2(point[1]))
+      );
       this.canvasContext.stroke();
       this.canvasContext.closePath();
     }
@@ -142,6 +183,8 @@ class LineChartCanvas extends Component {
   drawValueAxis() {
     // draw the horizontaal line
     this.axesContext.beginPath();
+    this.axesContext.strokeStyle = "#000000";
+    this.axesContext.lineWidth = 2;
     this.axesContext.moveTo(Math.round(this.xScale(0)), margin.top);
     this.axesContext.lineTo(Math.round(this.xScale(0)), height - margin.bottom);
     this.axesContext.stroke();
@@ -149,29 +192,47 @@ class LineChartCanvas extends Component {
   }
 
   drawGrids() {
-    this.axesContext.strokeStyle = "#E1E1E1";
-    this.axesContext.lineWidth = 1;
     // virtical grids
     let x = this.xScale(this.timeTickSize);
     this.axesContext.beginPath();
+    this.axesContext.strokeStyle = "#E1E1E1";
+    this.axesContext.lineWidth = 1;
+    let f = false;
     while (x < width - margin.right) {
-      this.axesContext.moveTo(x, height - margin.bottom);
-      this.axesContext.lineTo(x, margin.bottom);
+      if (f) {
+        this.axesContext.moveTo(x, height - margin.bottom);
+        this.axesContext.lineTo(x, margin.bottom);
+      }
+      f = true;
       x += this.xScale(this.timeTickSize);
     }
 
     // horizontal grids
-    let y = this.yScale(this.valueTickSize);
+    let y = this.valueTickSize;
     while (y < height - margin.top) {
       this.axesContext.moveTo(margin.left, y);
       this.axesContext.lineTo(width - margin.right, y);
-      y += this.yScale(this.valueTickSize);
+      y += this.valueTickSize;
     }
 
     this.axesContext.stroke();
     this.axesContext.closePath();
-    this.axesContext.strokeStyle = "black";
+
+    y = this.valueTickSize;
+    this.axesContext.beginPath();
+    this.axesContext.strokeStyle = "#000000";
     this.axesContext.lineWidth = 2;
+    while (y < height - margin.top) {
+      y += this.valueTickSize;
+      this.drawTick(y, "horizontal");
+      this.axesContext.fillText(
+        this.yScaleInv(y).toFixed(2),
+        margin.left - 35,
+        y
+      );
+    }
+    this.axesContext.stroke();
+    this.axesContext.closePath();
   }
 
   drawTimeAxis(time) {
@@ -191,7 +252,7 @@ class LineChartCanvas extends Component {
     let x = this.xScale(this.lastTick * 1000);
     let t = Math.round(this.lastTime);
     while (x > margin.left) {
-      this.drawVerTick(x);
+      this.drawTick(x, "vertical");
       this.axesContext.fillText(
         timeFormat(t),
         x - 6,
@@ -205,14 +266,27 @@ class LineChartCanvas extends Component {
     this.lastTick -= this.context.rate;
   }
 
-  drawVerTick(x) {
-    this.axesContext.moveTo(x, height - margin.bottom);
-    this.axesContext.lineTo(x, height - margin.bottom - 5);
+  drawTick(p, direction) {
+    if (direction === "vertical") {
+      this.axesContext.moveTo(p, height - margin.bottom);
+      this.axesContext.lineTo(p, height - margin.bottom - 5);
+    } else if (direction === "horizontal") {
+      this.axesContext.moveTo(margin.left, p);
+      this.axesContext.lineTo(margin.left + 5, p);
+    }
   }
 
   getCoordinates(data) {
     const { value, timestamp } = data;
     return [timestamp, value];
+  }
+
+  componentDidUpdate() {
+    if (this.dataRange !== this.props.dataRange) {
+      this.dataRange = this.getRange(this.props.dataRange);
+      this.valueTickSize = this.getValueTickSize(this.props.dataRange);
+      console.log(this.valueTickSize);
+    }
   }
 
   componentDidMount() {

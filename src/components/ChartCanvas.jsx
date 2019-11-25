@@ -6,8 +6,8 @@ import VisPanelContext from "./VisPanelContext";
 var overviewHeight = 150;
 
 export const ChartCanvas = props => {
-  const { type, id } = props.drawingRequest;
-  const { dataToDraw } = React.useContext(VisPanelContext);
+  const { type, id, sensor, feature } = props.drawingRequest;
+  const { dataToDraw, dataRange } = React.useContext(VisPanelContext);
   // determine the chart type
   let chart = null;
   if (type === "line_chart") {
@@ -16,6 +16,7 @@ export const ChartCanvas = props => {
         {() => (
           <LineChartCanvas
             dataToDraw={dataToDraw}
+            dataRange={dataRange[sensor][feature]}
             key={id}
             reqId={id}
             oh={overviewHeight}
