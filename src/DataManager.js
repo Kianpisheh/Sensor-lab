@@ -67,8 +67,8 @@ class DataManager {
 
   _getAudioFeature(qFeature, timestamp, index, tolerence) {
     if (qFeature === "raw") {
-      let idx = Math.floor((timestamp / 1000) * this.samplingRate);
-      return [this.data["audio"]["raw"][idx], null];
+      let idx = Math.floor((timestamp / 1000) * this.audioSampleRate);
+      return this.data["audio"]["raw"][idx];
     }
 
     // everything except FFT and Raw
@@ -80,7 +80,7 @@ class DataManager {
           index
         );
         if (nextTimestamp - timestamp > tolerence * 1000) {
-          return [null, index];
+          return null;
         }
         let valuesObj = {};
         Object.keys(this.data["audio"]).forEach(feature_ => {
@@ -89,7 +89,7 @@ class DataManager {
             valuesObj[f_index] = this.data["audio"][feature_][nextIndex];
           }
         });
-        return [objectToArray(valuesObj), nextIndex];
+        return objectToArray(valuesObj);
       } else {
         return this._getSensorFeature(
           "audio",
@@ -106,7 +106,7 @@ class DataManager {
         index
       );
       if (nextTimestamp - timestamp > tolerence * 1000) {
-        return [null, index];
+        return null;
       }
       let valuesObj = {};
       Object.keys(this.data["fft"]).forEach(feature_ => {
@@ -115,7 +115,7 @@ class DataManager {
           valuesObj[f_index] = this.data["fft"][feature_][nextIndex];
         }
       });
-      return [objectToArray(valuesObj), nextIndex];
+      return objectToArray(valuesObj);
     }
   }
 

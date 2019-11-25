@@ -1,11 +1,23 @@
 export default () => {
   onmessage = e => {
     // retrieve data
-    const { timestamps, data, width, height, timeWindow, dataRange } = e.data;
+    const {
+      timestamps,
+      data,
+      width,
+      height,
+      timeWindow,
+      dataRange,
+      sensor,
+      feature,
+      audioSR,
+      step
+    } = e.data;
 
     // TODO: make it a global variable (take it from the app thread)
     const margin = { top: 20, right: 10, bottom: 20, left: 40 };
 
+    let rawAudio = sensor === "audio" && feature === "raw";
     // setup the offscreen canvas
     var canvas = new OffscreenCanvas(width, height);
     var canvasContext = canvas.getContext("2d");
@@ -13,32 +25,37 @@ export default () => {
 
     // draw the path (line chart)
     canvasContext.beginPath();
-    for (let i = 0; i < timestamps.length; i++) {
+    for (let i = 0; i < data.length; i += step) {
       if (data[i] === null) {
         continue;
       }
-      if (i === 0) {
-        canvasContext.moveTo(
-          (timestamps[i] / (timeWindow * 1000)) *
-            (width - margin.right - margin.left) +
-            margin.left,
-          height -
-            margin.bottom -
-            ((data[i] - dataRange[0]) / (dataRange[1] - dataRange[0])) *
-              (height - margin.top - margin.bottom)
-        );
+
+      // get time
+      let time;
+      if (rawAudio) {
+        time = Math.floor((i / audioSR) * 1000);
       } else {
-        canvasContext.lineTo(
-          (timestamps[i] / (timeWindow * 1000)) *
-            (width - margin.right - margin.left) +
-            margin.left,
-          height -
-            margin.bottom -
-            ((data[i] - dataRange[0]) / (dataRange[1] - dataRange[0])) *
-              (height - margin.top - margin.bottom)
-        );
+        time = timestamps[i];
+      }
+
+      // coordinate
+      let x =
+        (time / (timeWindow * 1000)) * (width - margin.right - margin.left) +
+        margin.left;
+      let y =
+        height -
+        margin.bottom -
+        ((data[i] - dataRange[0]) / (dataRange[1] - dataRange[0])) *
+          (height - margin.top - margin.bottom);
+
+      // draw
+      if (i === 0) {
+        canvasContext.moveTo(x, y);
+      } else {
+        canvasContext.lineTo(x, y);
       }
     }
+
     canvasContext.stroke();
     canvasContext.closePath();
 

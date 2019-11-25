@@ -31,14 +31,14 @@ export const ChartCanvas = props => {
               reqId={id}
               oh={overviewHeight}
             ></LineChartCanvas>
-            {/* <OverviewLineChart
+            <OverviewLineChart
               key={props.id}
               idx={props.idx}
               currentTime={currentTime}
               dataRange={dataRange[sensor][feature]}
               drawingRequest={props.drawingRequest}
               hp={height}
-            ></OverviewLineChart> */}
+            ></OverviewLineChart>
           </React.Fragment>
         )}
       </VisPanelContext.Consumer>

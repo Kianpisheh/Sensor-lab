@@ -14,7 +14,6 @@ class OverviewLineChart extends Component {
 
   constructor(props, context) {
     super(props);
-    this.dataBath = null;
     this.sensor = null;
     this.feature = null;
     this.completeView = null;
@@ -77,7 +76,7 @@ class OverviewLineChart extends Component {
     this.sensor = sensor;
     this.feature = feature;
 
-    //setup the on screen canvas
+    //setup the on-screen canvas
     this.canvas = this.refs.canvas;
     this.canvasContext = this.canvas.getContext("2d");
   }
@@ -87,15 +86,26 @@ class OverviewLineChart extends Component {
       console.log("null sensor or feature");
       return;
     }
-    this.dataBatch = this.context.dataBatch[sensor][feature];
     let timestamps = this.context.dataBatch[sensor]["timestamp"];
 
     // calculate off-screen canvas width
-    const offScreenCanvasWidth = Math.floor(
-      ((timestamps[timestamps.length - 1] - timestamps[0]) /
-        (this.timeWindow * 1000)) *
-        width
+    let dataDuration = 100 * 1000;
+    if (sensor === "audio" && feature === "raw") {
+      dataDuration = Math.floor(
+        (this.context.dataBatch["audio"]["raw"].length / this.context.audioSR) *
+          1000
+      );
+    } else {
+      dataDuration = timestamps[timestamps.length - 1] - timestamps[0];
+    }
+    let offScreenCanvasWidth = Math.floor(
+      Math.floor((dataDuration / (this.timeWindow * 1000)) * width)
     );
+
+    let step = 1;
+    if (sensor === "audio" && feature === "raw") {
+      step = 20;
+    }
 
     // create the worker thread
     let drawBatchDataWorker = new WebWorker(DrawBatchDataWorker);
@@ -104,8 +114,7 @@ class OverviewLineChart extends Component {
 
       this.completeView = e.data;
       let xCoord = Math.floor(
-        ((this.context.overviewCurrTime * 60000) /
-          timestamps[timestamps.length - 1]) *
+        ((this.context.overviewCurrTime * 60000) / dataDuration) *
           offScreenCanvasWidth
       );
       // get image (the portion we need)
@@ -125,11 +134,15 @@ class OverviewLineChart extends Component {
     // send data to the worker thread for drawing
     drawBatchDataWorker.postMessage({
       timestamps: timestamps,
-      data: this.dataBatch,
+      sensor,
+      feature,
+      data: this.context.dataBatch[sensor][feature],
       width: offScreenCanvasWidth,
       height: height,
       timeWindow: this.timeWindow,
-      dataRange: this.props.dataRange
+      dataRange: this.props.dataRange,
+      audioSR: this.context.audioSR,
+      step
     });
   }
 
