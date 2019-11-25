@@ -31,20 +31,26 @@ export const ChartCanvas = props => {
               reqId={id}
               oh={overviewHeight}
             ></LineChartCanvas>
-            <OverviewLineChart
+            {/* <OverviewLineChart
               key={props.id}
               idx={props.idx}
               currentTime={currentTime}
               dataRange={dataRange[sensor][feature]}
               drawingRequest={props.drawingRequest}
               hp={height}
-            ></OverviewLineChart>
+            ></OverviewLineChart> */}
           </React.Fragment>
         )}
       </VisPanelContext.Consumer>
     );
   } else if (type === "heatmap") {
-    chart = <Heatmap></Heatmap>;
+    chart = (
+      <Heatmap
+        key={id}
+        dataToDraw={dataToDraw}
+        // ylim={drawingRequest.featureRange}
+      ></Heatmap>
+    );
   }
   return <div className="chart_canvas_container">{chart}</div>;
 };

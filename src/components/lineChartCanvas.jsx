@@ -44,8 +44,6 @@ class LineChartCanvas extends Component {
     // tick size
     this.timeTickSize = context.timeWindow / 10;
 
-    console.log(this.valueTickSize);
-
     // method binding :(
     this.getCoordinates = this.getCoordinates.bind(this);
     this.drawLine = this.drawLine.bind(this);

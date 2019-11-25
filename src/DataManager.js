@@ -8,7 +8,7 @@ class DataManager {
     this.audioURL = null;
     this.load = this.load.bind(this);
     this.onDataLoaded = onDataLoaded;
-    this.audioSampleRate = 22050;
+    this.audioSampleRate = 22050; // TODO: get automatically
     this.loaded = [];
     this.audio = null;
     this.parser = null;
@@ -66,8 +66,13 @@ class DataManager {
   }
 
   _getAudioFeature(qFeature, timestamp, index, tolerence) {
+    if (qFeature === "raw") {
+      let idx = Math.floor((timestamp / 1000) * this.samplingRate);
+      return [this.data["audio"]["raw"][idx], null];
+    }
+
     // everything except FFT and Raw
-    if (qFeature !== "raw" && qFeature !== "fft") {
+    else if (qFeature !== "raw" && qFeature !== "fft") {
       if (qFeature === "mfcc" || qFeature === "chroma") {
         let [nextIndex, nextTimestamp] = this._findNextIndex(
           this.data["audio"],

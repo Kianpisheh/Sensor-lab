@@ -128,18 +128,21 @@ class DrawingRequestManager {
     return sfList;
   }
 
-  _createAudioFeatureList(audioFeatureList) {
-    let featureList = ["mfcc", "chroma", "fft"];
-    audioFeatureList.forEach(feature => {
-      if (
-        feature.split("_")[0] !== "mfcc" &&
-        feature.split("_")[0] !== "chroma"
-      ) {
-        featureList.push(feature);
+  _createAudioFeatureList(exhaustiveFeatureList) {
+    let featureList = new Set();
+    exhaustiveFeatureList.forEach(feature => {
+      if (feature.split("_")[0] === "mfcc") {
+        featureList.add("mfcc");
+      } else if (feature.split("_")[0] === "chroma") {
+        featureList.add("chroma");
+      } else if (feature.split("_")[0] === "fft") {
+        featureList.add("chroma");
+      } else {
+        featureList.add(feature);
       }
     });
 
-    return featureList;
+    return Array.from(featureList);
   }
 
   resetIndex(drawingRequestsList) {

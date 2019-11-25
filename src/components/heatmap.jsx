@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import AppContext from "../AppContext";
 
 const width = 500;
-const height = 300;
+const height = 250;
 const margin = { top: 20, right: 10, bottom: 20, left: 30 };
 
 class Heatmap extends Component {
@@ -19,15 +19,14 @@ class Heatmap extends Component {
     this.rate = context.rate;
     this.canvas = null;
     this.ctx = null;
+    this.numSamples = null;
+    this.numFeatures = null;
+    this.data = null;
+
+    // method bindings
     this.drawHeatmap = this.drawHeatmap.bind(this);
     this.updateDrawingTools = this.updateDrawingTools.bind(this);
 
-    this.numSamples = this.props.dataToDraw.length;
-
-    this.numFeatures = this.props.dataToDraw.value[0].length;
-    this.data = new Array(this.numSamples).fill(
-      new Array(this.numFeatures).fill(null)
-    );
     // setup scales
     this.setScales();
   }
@@ -37,24 +36,18 @@ class Heatmap extends Component {
     this.canvas.width = width;
     this.canvas.height = height;
     this.ctx = this.canvas.getContext("2d");
-    this.numSamples = this.props.dataToDraw.length;
-
-    this.numFeatures = this.props.dataToDraw[0].value.length;
-    this.data = new Array(this.numSamples).fill(
-      new Array(this.numFeatures).fill(null)
-    );
-    // setup scales
-    this.setScales();
   }
 
   render() {
-    this.updateDrawingTools();
-    let data = this.props.dataToDraw;
-    if (data[data.length - 1].value !== undefined) {
-      this.data.push(data[data.length - 1].value);
-      this.data.shift();
-      if (this.ctx !== null) {
-        this.drawHeatmap(this.data[this.data.length - 1]);
+    if (this.props.dataToDraw !== null) {
+      this.updateDrawingTools();
+      let data = this.props.dataToDraw;
+      if (data[data.length - 1].value !== undefined) {
+        this.data.push(data[data.length - 1].value);
+        this.data.shift();
+        if (this.ctx !== null) {
+          this.drawHeatmap(this.data[this.data.length - 1]);
+        }
       }
     }
     return <canvas ref="canvas" width={width} height={height} />;
@@ -62,7 +55,6 @@ class Heatmap extends Component {
 
   updateDrawingTools() {
     this.numSamples = this.props.dataToDraw.length;
-
     this.numFeatures = this.props.dataToDraw.value[0].length;
     this.data = new Array(this.numSamples).fill(
       new Array(this.numFeatures).fill(null)
@@ -71,29 +63,31 @@ class Heatmap extends Component {
   }
 
   setScales() {
-    // setup scales
-    this.xScale = d3
-      .scaleLinear()
-      .domain([0, this.timeWindow * 1000])
-      .range([margin.left, width - margin.right]);
-    this.yScale = d3
-      .scaleLinear()
-      .domain([0, this.props.numFeatures - 1])
-      .range([height - margin.bottom, margin.top]);
+    if (this.numFeatures !== null) {
+      // setup scales
+      this.xScale = d3
+        .scaleLinear()
+        .domain([0, this.timeWindow * 1000])
+        .range([margin.left, width - margin.right]);
+      this.yScale = d3
+        .scaleLinear()
+        .domain([0, this.props.numFeatures - 1])
+        .range([height - margin.bottom, margin.top]);
 
-    this.colorScale = d3.scaleSequential(d3.interpolateViridis);
+      this.colorScale = d3.scaleSequential(d3.interpolateViridis);
 
-    //const domain = this.props.ylim;
-    // TODO: domain from the input data
-    const domain = [-20, 20];
+      //const domain = this.props.ylim;
+      // TODO: domain from the input data
+      const domain = [-20, 20];
 
-    if (this.logScale) {
-      this.colorScale.domain([
-        Math.log10(Math.abs(domain[0])),
-        Math.log10(Math.abs(domain[1]))
-      ]);
-    } else {
-      this.colorScale.domain(domain);
+      if (this.logScale) {
+        this.colorScale.domain([
+          Math.log10(Math.abs(domain[0])),
+          Math.log10(Math.abs(domain[1]))
+        ]);
+      } else {
+        this.colorScale.domain(domain);
+      }
     }
   }
 
