@@ -4,7 +4,7 @@ import AppContext from "../AppContext";
 
 const width = 500;
 const height = 250;
-const margin = { top: 20, right: 30, bottom: 20, left: 40 };
+const margin = { top: 20, right: 30, bottom: 30, left: 40 };
 
 function timeFormat(time) {
   let seconds = time % 60;

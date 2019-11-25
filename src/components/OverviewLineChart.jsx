@@ -1,17 +1,16 @@
 import React, { Component } from "react";
-import AppContext from "../AppContext";
+import VisPanelContext from "./VisPanelContext";
 import DrawBatchDataWorker from "../DrawBatchDataWorker.js";
 import WebWorker from "../WebWorker";
 import GetImageWorker from "../GetImageWorker";
 
 const width = 500;
 const height = 150;
-const margin = { top: 20, right: 10, bottom: 20, left: 30 };
 //TODO
 
 class OverviewLineChart extends Component {
   // access the canvas
-  static contextType = AppContext;
+  static contextType = VisPanelContext;
 
   constructor(props, context) {
     super(props);
@@ -48,7 +47,6 @@ class OverviewLineChart extends Component {
           style={{
             position: "absolute",
             left: 0,
-            top: this.props.hp * (this.props.idx + 1) + this.props.idx * height,
             zIndex: 0
           }}
           id={"layer1"}
@@ -58,16 +56,14 @@ class OverviewLineChart extends Component {
         />
         <canvas
           style={{
-            position: "absolute",
             left: 0,
-            top: this.props.hp * (this.props.idx + 1) + this.props.idx * height,
             zIndex: 1,
             overflow: "scroll"
           }}
           id={"layer2"}
           ref={"canvas"}
-          width="500"
-          height="150"
+          width={width}
+          height={height}
         />
       </div>
     );
@@ -132,7 +128,8 @@ class OverviewLineChart extends Component {
       data: this.dataBatch,
       width: offScreenCanvasWidth,
       height: height,
-      timeWindow: this.timeWindow
+      timeWindow: this.timeWindow,
+      dataRange: this.props.dataRange
     });
   }
 

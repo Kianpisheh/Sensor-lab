@@ -1,10 +1,10 @@
 export default () => {
   onmessage = e => {
     // retrieve data
-    const { timestamps, data, width, height, timeWindow } = e.data;
+    const { timestamps, data, width, height, timeWindow, dataRange } = e.data;
 
     // TODO: make it a global variable (take it from the app thread)
-    const margin = { top: 20, right: 10, bottom: 20, left: 30 };
+    const margin = { top: 20, right: 10, bottom: 20, left: 40 };
 
     // setup the offscreen canvas
     var canvas = new OffscreenCanvas(width, height);
@@ -22,18 +22,20 @@ export default () => {
           (timestamps[i] / (timeWindow * 1000)) *
             (width - margin.right - margin.left) +
             margin.left,
-          ((data[i] + 40) / 80) * (-height + margin.top - margin.bottom) +
-            height -
-            margin.bottom
+          height -
+            margin.bottom -
+            ((data[i] - dataRange[0]) / (dataRange[1] - dataRange[0])) *
+              (height - margin.top - margin.bottom)
         );
       } else {
         canvasContext.lineTo(
           (timestamps[i] / (timeWindow * 1000)) *
             (width - margin.right - margin.left) +
             margin.left,
-          ((data[i] + 40) / 80) * (-height + margin.top - margin.bottom) +
-            height -
-            margin.bottom
+          height -
+            margin.bottom -
+            ((data[i] - dataRange[0]) / (dataRange[1] - dataRange[0])) *
+              (height - margin.top - margin.bottom)
         );
       }
     }
