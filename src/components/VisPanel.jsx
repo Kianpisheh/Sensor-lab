@@ -31,6 +31,7 @@ class VisPanel extends Component {
     this.handleAudioEvent = this.handleAudioEvent.bind(this);
     this.onFeatureSelectorChanged = this.onFeatureSelectorChanged.bind(this);
     this.onNextTimestamp = this.onNextTimestamp.bind(this);
+    this.onOverviewSettingsChange = this.onOverviewSettingsChange.bind(this);
 
     this.drawingRequestManager = new DrawingRequestManager();
     this.dataManager = new DataManager(this.handleDataLoaded);
@@ -97,6 +98,15 @@ class VisPanel extends Component {
     });
   }
 
+  onOverviewSettingsChange(values) {
+    // values are in minutes
+    const [start, duration] = values;
+    this.setState({
+      overviewTimeWindow: duration * 60,
+      overviewCurrTime: start
+    });
+  }
+
   onNextTimestamp(timestamp) {
     // get the new data points
     const [newSamples, newIndeces] = this.dataManager.getSample(
@@ -138,6 +148,7 @@ class VisPanel extends Component {
             drawingRequest={req}
             sensorsFeatureList={this.drawingRequestManager.sensorFeatureList}
             onFeatureSelectorChanged={this.onFeatureSelectorChanged}
+            onOverviewSettingsChange={this.onOverviewSettingsChange}
           ></ChartPanel>
           <Controller
             key={req.id + "controller" + this.props.v}
