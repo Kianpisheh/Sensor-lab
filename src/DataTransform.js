@@ -23,7 +23,12 @@ function removeTimeOffset(data) {
   for (var sensor in data) {
     // exclude audio; TODO: make all sensor data like eachother
     if (sensor !== "audio" && sensor !== "fft") {
-      timestamps.push(data[sensor]["timestamp"][0]);
+      let h = sensor.split("_");
+      if (sensor.includes("audio") && h[h.length - 1] !== "f") {
+        continue;
+      } else {
+        timestamps.push(data[sensor]["timestamp"][0]);
+      }
     }
   }
   let minTimestamp = Math.min(...timestamps);
@@ -31,11 +36,16 @@ function removeTimeOffset(data) {
   for (var sensor2 in data) {
     // exclude audio; TODO: make all sensor data like eachother
     if (sensor2 !== "audio" && sensor2 !== "fft") {
-      newData[sensor2]["timestamp"] = data[sensor2]["timestamp"].map(
-        timestamp => {
-          return timestamp - minTimestamp;
-        }
-      );
+      let h = sensor2.split("_");
+      if (sensor2.includes("audio") && h[h.length - 1] !== "f") {
+        continue;
+      } else {
+        newData[sensor2]["timestamp"] = data[sensor2]["timestamp"].map(
+          timestamp => {
+            return timestamp - minTimestamp;
+          }
+        );
+      }
     }
   }
   return newData;

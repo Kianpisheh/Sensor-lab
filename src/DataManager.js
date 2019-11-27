@@ -128,7 +128,7 @@ class DataManager {
     );
 
     if (nextTimestamp - timestamp > tolerence * 1000) {
-      return [null, index];
+      return [null, nextIndex];
     }
     return [this.data[qSensor][qFeature][nextIndex], nextIndex];
   }

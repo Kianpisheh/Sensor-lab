@@ -15,7 +15,7 @@ export default () => {
     } = e.data;
 
     // TODO: make it a global variable (take it from the app thread)
-    const margin = { top: 20, right: 10, bottom: 20, left: 40 };
+    const margin = { top: 10, right: 10, bottom: 10, left: 40 };
 
     let rawAudio = sensor === "audio" && feature === "raw";
     // setup the offscreen canvas

@@ -88,6 +88,7 @@ class VisPanel extends Component {
     let dataRange = this.dataManager.calcDataRange(
       this.drawingRequestManager.sensorFeatureList
     );
+    console.log(this.dataManager.data);
     this.setState({
       drawingRequestsList: initialDrawingRequest,
       isAudioLoaded: true,

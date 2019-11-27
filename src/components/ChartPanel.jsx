@@ -16,6 +16,7 @@ function ChartPanel(props) {
         drawingRequest={props.drawingRequest}
       ></ChartCanvas>
       <OverviewChartPropTab
+        drawingRequest={props.drawingRequest}
         onOverviewSettingsChange={props.onOverviewSettingsChange}
       ></OverviewChartPropTab>
     </div>

@@ -96,7 +96,8 @@ class OverviewLineChart extends Component {
           1000
       );
     } else {
-      dataDuration = timestamps[timestamps.length - 1] - timestamps[0];
+      // FIXME: the last timestamp sometimes is negative
+      dataDuration = timestamps[timestamps.length - 5] - timestamps[0];
     }
     let offScreenCanvasWidth = Math.floor(
       Math.floor((dataDuration / (this.timeWindow * 1000)) * width)
@@ -113,10 +114,16 @@ class OverviewLineChart extends Component {
       this.canvasContext.clearRect(0, 0, width, height);
 
       this.completeView = e.data;
-      let xCoord = Math.floor(
+      let xCoord_0 = Math.floor(
         ((this.context.overviewCurrTime * 60000) / dataDuration) *
           offScreenCanvasWidth
       );
+      let xCoord_1 = Math.floor(
+        ((this.context.overviewCurrTime * 60000 + this.timeWindow * 1000) /
+          dataDuration) *
+          offScreenCanvasWidth
+      );
+      console.log("width", offScreenCanvasWidth);
       // get image (the portion we need)
       let getImageWorker = new WebWorker(GetImageWorker);
       getImageWorker.onmessage = e => {
@@ -124,7 +131,8 @@ class OverviewLineChart extends Component {
       };
       getImageWorker.postMessage({
         imageData: this.completeView,
-        x0: xCoord,
+        x0: xCoord_0,
+        x1: xCoord_1,
         y0: 0,
         width: width,
         height: height

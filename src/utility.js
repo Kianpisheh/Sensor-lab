@@ -1,6 +1,5 @@
 function calcfeatureRange(data, sensorFeatureList) {
   let featureRange = {};
-  console.log(sensorFeatureList);
   Object.keys(data).forEach(sensor => {
     featureRange[sensor] = {};
     sensorFeatureList[sensor].forEach(feature => {
