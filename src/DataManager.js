@@ -39,7 +39,14 @@ class DataManager {
 
       let featureValue = null;
       let newIndex = currIdx;
-      if (sensor === "audio") {
+
+      if (sensor === "watch_movement") {
+        [featureValue, newIndex] = this._getWatchMovmentData(
+          timestamp,
+          tolerence,
+          currIdx
+        );
+      } else if (sensor === "audio") {
         featureValue = this._getAudioFeature(
           feature,
           timestamp,
@@ -63,6 +70,71 @@ class DataManager {
       newIndeces[drawingRequest.id] = newIndex;
     });
     return [samples, newIndeces];
+  }
+
+  _getWatchMovmentData(timestamp, tolerence, currIdx) {
+    // get motion sensors
+    let featureValue = {};
+    let indeces = {};
+    let desiredSensorList = [];
+    const sensorList = Object.keys(this.data);
+    sensorList.forEach(sensor => {
+      if (this._isMotionSenor(sensor)) {
+        let features = Object.keys(this.data[sensor]);
+        features.splice("timestamp", 1);
+        let rawFeatureNum = 0;
+        features.forEach(feature => {
+          if (feature.includes("raw")) {
+            rawFeatureNum += 1;
+          }
+        });
+        if (rawFeatureNum === features.length) {
+          // timestamp is one of the features
+          desiredSensorList.push(sensor);
+        }
+      }
+    });
+
+    // check if any motion sensor is available
+    if (desiredSensorList.length === 0) {
+      console.log("No motion sensor available");
+    }
+
+    // initialize indeces if needed
+    desiredSensorList.forEach(sensor => {
+      if (!(sensor in currIdx)) {
+        currIdx[sensor] = 0;
+      }
+    });
+
+    //
+    desiredSensorList.forEach(sensor => {
+      let features = Object.keys(this.data[sensor]);
+      let sampleValues = [];
+      let value = null;
+      let newIndex = null;
+      features.forEach(feature => {
+        [value, newIndex] = this._getSensorFeature(
+          sensor,
+          feature,
+          timestamp,
+          currIdx[sensor],
+          tolerence
+        );
+        sampleValues.push(value);
+      });
+      featureValue[sensor] = sampleValues;
+      indeces[sensor] = newIndex;
+    });
+    return [featureValue, indeces];
+  }
+
+  _isMotionSenor(sensor) {
+    return (
+      sensor.includes("gyro") ||
+      sensor.includes("acc") ||
+      sensor.includes("rot")
+    );
   }
 
   _getAudioFeature(qFeature, timestamp, index, tolerence) {

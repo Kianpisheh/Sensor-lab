@@ -123,7 +123,6 @@ class OverviewLineChart extends Component {
           dataDuration) *
           offScreenCanvasWidth
       );
-      console.log("width", offScreenCanvasWidth);
       // get image (the portion we need)
       let getImageWorker = new WebWorker(GetImageWorker);
       getImageWorker.onmessage = e => {

@@ -10,6 +10,7 @@ function ChartPanel(props) {
         drawingRequest={props.drawingRequest}
         sensorsFeatureList={props.sensorsFeatureList}
         onFeatureSelectorChanged={props.onFeatureSelectorChanged}
+        onActCheckboxClicked={props.onActivityVisClicked}
       ></ChartPropTab>
       <ChartCanvas
         className="chart_canvas"

@@ -7,11 +7,14 @@ import ChartPanel from "./ChartPanel";
 import VisPanelContext from "./VisPanelContext";
 import Clock from "../Clock";
 import Controller from "./Controller";
+import ActVis from "./ActVis";
 
 class VisPanel extends Component {
+  static contextType = VisPanelContext;
+
   state = {
     isAudioLoaded: false,
-    rate: 0.03,
+    rate: 0.003,
     isPlaying: false,
     timeWindow: 10, // seconds
     overviewTimeWindow: 800, // seconds
@@ -22,7 +25,8 @@ class VisPanel extends Component {
     dataToDraw: null,
     audioSR: null,
     dataBatch: null,
-    dataRange: null
+    dataRange: null,
+    watchMovement: false
   };
 
   constructor(props) {
@@ -32,10 +36,23 @@ class VisPanel extends Component {
     this.onFeatureSelectorChanged = this.onFeatureSelectorChanged.bind(this);
     this.onNextTimestamp = this.onNextTimestamp.bind(this);
     this.onOverviewSettingsChange = this.onOverviewSettingsChange.bind(this);
+    this.onActivityVisClicked = this.onActivityVisClicked.bind(this);
 
     this.drawingRequestManager = new DrawingRequestManager();
     this.dataManager = new DataManager(this.handleDataLoaded);
     this.clock = new Clock(this.state.rate, this.onNextTimestamp);
+  }
+
+  onActivityVisClicked(checked, id) {
+    let updatedDrawingRequest = this.drawingRequestManager.handleWatchMovRequest(
+      this.state.drawingRequestsList,
+      checked,
+      id
+    );
+    this.setState({
+      drawingRequestsList: updatedDrawingRequest,
+      watchMovement: checked
+    });
   }
 
   handleAudioEvent(eventType, value) {
@@ -88,7 +105,6 @@ class VisPanel extends Component {
     let dataRange = this.dataManager.calcDataRange(
       this.drawingRequestManager.sensorFeatureList
     );
-    console.log(this.dataManager.data);
     this.setState({
       drawingRequestsList: initialDrawingRequest,
       isAudioLoaded: true,
@@ -138,32 +154,54 @@ class VisPanel extends Component {
   }
 
   render() {
-    let view = (
+    let controller = null;
+    let watchMovement = null;
+
+    let charts = (
       <DropUploader onInputDataRequest={this.dataManager.load}></DropUploader>
     );
     if (this.state.isDataLoaded) {
-      view = this.state.drawingRequestsList.map(req => (
-        <React.Fragment key={req.id + "frag"}>
-          <ChartPanel
-            key={req.id + "chart_panel" + this.props.v}
-            drawingRequest={req}
-            sensorsFeatureList={this.drawingRequestManager.sensorFeatureList}
-            onFeatureSelectorChanged={this.onFeatureSelectorChanged}
-            onOverviewSettingsChange={this.onOverviewSettingsChange}
-          ></ChartPanel>
-          <Controller
-            key={req.id + "controller" + this.props.v}
-            audio={this.audio}
-            clockTime={Math.floor(this.clock.time / 1000)}
-            isAudioPlaying={this.state.isPlaying}
-            eventHandler={this.handleAudioEvent}
-          ></Controller>
-        </React.Fragment>
-      ));
+      charts = [];
+      this.state.drawingRequestsList.forEach(req => {
+        if (req.type === "watch_movement") {
+          watchMovement = (
+            <ActVis
+              key={req.id}
+              drawingRequest={req}
+              data={this.context.dataToDraw}
+            ></ActVis>
+          );
+        } else {
+          charts.push(
+            <ChartPanel
+              key={req.id + "chart_panel" + this.props.v}
+              drawingRequest={req}
+              sensorsFeatureList={this.drawingRequestManager.sensorFeatureList}
+              onFeatureSelectorChanged={this.onFeatureSelectorChanged}
+              onOverviewSettingsChange={this.onOverviewSettingsChange}
+              onActivityVisClicked={this.onActivityVisClicked}
+            ></ChartPanel>
+          );
+        }
+      });
+
+      controller = (
+        <Controller
+          key={"controller_" + this.props.v}
+          audio={this.audio}
+          clockTime={Math.floor(this.clock.time / 1000)}
+          isAudioPlaying={this.state.isPlaying}
+          eventHandler={this.handleAudioEvent}
+        ></Controller>
+      );
     }
     return (
       <VisPanelContext.Provider value={this.state}>
-        <div className="vis_panel_container">{view}</div>
+        <div className="vis_panel_container">
+          {charts}
+          {watchMovement}
+          {controller}
+        </div>
       </VisPanelContext.Provider>
     );
   }

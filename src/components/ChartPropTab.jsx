@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import NativeSelect from "@material-ui/core/NativeSelect";
+import { Checkbox, FormControlLabel } from "@material-ui/core";
+import VisPanelContext from "./VisPanelContext";
 
 export const ChartPropTab = props => {
   const { sensor, id } = props.drawingRequest;
+
+  const context = useContext(VisPanelContext);
 
   // get sensor and feature lists
   let sensorList = Object.keys(props.sensorsFeatureList);
@@ -12,7 +16,7 @@ export const ChartPropTab = props => {
     <div className="chart_prop_tab">
       <NativeSelect
         key={id + "sensor"}
-        className="select"
+        className="chart_prop_item"
         value={props.sensor}
         onChange={event => {
           props.onFeatureSelectorChanged(event.target.value, id, true);
@@ -26,7 +30,7 @@ export const ChartPropTab = props => {
       </NativeSelect>
       <NativeSelect
         key={id + "feature"}
-        className="select"
+        className="chart_prop_item"
         value={props.feature}
         onChange={event => {
           props.onFeatureSelectorChanged(event.target.value, id, false);
@@ -38,6 +42,18 @@ export const ChartPropTab = props => {
           </option>
         ))}
       </NativeSelect>
+      <FormControlLabel
+        className="chart_prop_item"
+        control={
+          <Checkbox
+            checked={context.watchMovement}
+            onChange={event => {
+              props.onActCheckboxClicked(event.target.checked, id);
+            }}
+          />
+        }
+        label="Watch"
+      />
     </div>
   );
 };

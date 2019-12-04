@@ -1,3 +1,5 @@
+const ACT_VIS_ID = 1555;
+
 class DrawingRequestManager {
   constructor() {
     this.sensorFeatureList = null;
@@ -106,16 +108,41 @@ class DrawingRequestManager {
     }
   }
 
+  handleWatchMovRequest(currentRequests, checked, id) {
+    let updatedRequestList = [];
+    if (checked) {
+      updatedRequestList = currentRequests;
+      const drawingRequest = {
+        id: ACT_VIS_ID,
+        sensor: "watch_movement",
+        feature: "watch_movement",
+        currIdx: {},
+        type: "watch_movement"
+      };
+      updatedRequestList.push(drawingRequest);
+    } else {
+      currentRequests.forEach(req => {
+        if (req.id !== ACT_VIS_ID) {
+          updatedRequestList.push(req);
+        }
+      });
+    }
+    return updatedRequestList;
+  }
+
   _createSensorFeatureList(data) {
+    // get sensors from the loaded files
     let sfList = {};
     Object.keys(data).forEach(sensor => {
       if (sensor === "audio") {
+        // mfcc, chroma, fft
         sfList[sensor] = this._createAudioFeatureList(
           Object.keys(data[sensor])
         );
       } else if (sensor === "fft") {
         return;
       } else {
+        // sensor features + other audio features
         sfList[sensor] = Object.keys(data[sensor]);
         // exclude timestamp and time from feature list
         let index = sfList[sensor].indexOf("timestamp");
@@ -124,7 +151,6 @@ class DrawingRequestManager {
         if (index !== -1) sfList[sensor].splice(index, 1);
       }
     });
-
     return sfList;
   }
 
@@ -147,9 +173,13 @@ class DrawingRequestManager {
 
   resetIndex(drawingRequestsList) {
     let updatedRequestList = [];
-    drawingRequestsList.forEach(drawingRequest => {
-      drawingRequest.currIdx = 0;
-      updatedRequestList.push(drawingRequest);
+    drawingRequestsList.forEach(req => {
+      if (req.type === "watch_movement") {
+        req.idx = {};
+      } else {
+        req.currIdx = 0;
+      }
+      updatedRequestList.push(req);
     });
     return updatedRequestList;
   }

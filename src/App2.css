@@ -17,10 +17,14 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.chart_prop_item {
+  width: 150px;
+  margin-right: 16px;
+}
+
 .select {
   width: 160px;
-  margin-left: 5px;
-  margin-right: 5px;
+
 }
 
 .number_input {

@@ -12,7 +12,8 @@ const VisPanelContext = createContext({
   isDataLoaded: false,
   dataToDraw: null,
   audioSR: null,
-  dataBatch: null
+  dataBatch: null,
+  watchMovement: false
 });
 
 export default VisPanelContext;
