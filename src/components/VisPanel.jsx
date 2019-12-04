@@ -10,8 +10,6 @@ import Controller from "./Controller";
 import ActVis from "./ActVis";
 
 class VisPanel extends Component {
-  static contextType = VisPanelContext;
-
   state = {
     isAudioLoaded: false,
     rate: 0.003,
@@ -164,12 +162,12 @@ class VisPanel extends Component {
       charts = [];
       this.state.drawingRequestsList.forEach(req => {
         if (req.type === "watch_movement") {
+          let data = null;
+          if (this.state.dataToDraw) {
+            data = this.state.dataToDraw[req.id];
+          }
           watchMovement = (
-            <ActVis
-              key={req.id}
-              drawingRequest={req}
-              data={this.context.dataToDraw}
-            ></ActVis>
+            <ActVis key={req.id} drawingRequest={req} data={data}></ActVis>
           );
         } else {
           charts.push(

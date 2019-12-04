@@ -8,18 +8,28 @@ const margin = { top: 20, right: 30, bottom: 30, left: 40 };
 const ActVis = props => {
   const mount = useRef(null);
   const [isAnimating, setAnimating] = useState(true);
+  let [scene, setScene] = useState(null);
+  let [camera, setCamera] = useState(null);
+  let [cube, setCube] = useState(null);
+
   const controls = useRef(null);
 
   // setup
   useEffect(() => {
-    let frameId;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    scene = new THREE.Scene();
+    setCamera(new THREE.PerspectiveCamera(75, width / height, 0.1, 1000));
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-    const cube = new THREE.Mesh(geometry, material);
+    setCube(new THREE.Mesh(geometry, material));
+    return () => {
+      cleanup;
+    };
+  }, []);
+
+  // update
+  useEffect(() => {
+    let frameId;
 
     camera.position.z = 4;
     scene.add(cube);
@@ -40,11 +50,30 @@ const ActVis = props => {
     // };
 
     const animate = () => {
-      cube.rotation.x = 45;
-      cube.rotation.y = 45;
+      // get rotation data
+      const data = props.data;
+
+      if (data) {
+        let values = data.value;
+        if (values) {
+          let rotationVec = getSensorData("rot", values);
+          var m = new THREE.Matrix4();
+          m.set(...rotationVec);
+          let quaternion = new THREE.Quaternion();
+          quaternion.setFromRotationMatrix(m);
+          cube.matrix.makeRotationFromQuaternion(quaternion);
+          cube.matrixAutoUpdate = false;
+          // let acc = getSensorData("acc");
+          // console.log(rotation);
+        }
+      } else {
+      }
+
+      // cube.rotation.x = 45;
+      // cube.rotation.y = 45;
+      // cube.rotation.z += 10;
 
       renderScene();
-      frameId = window.requestAnimationFrame(animate);
     };
 
     const start = () => {
@@ -73,12 +102,12 @@ const ActVis = props => {
       geometry.dispose();
       material.dispose();
     };
-  }, []);
+  }, [props]);
 
   useEffect(() => {
     if (isAnimating) {
       controls.current.start();
-    } else {
+
       controls.current.stop();
     }
   }, [isAnimating]);
@@ -90,6 +119,17 @@ const ActVis = props => {
       onClick={() => setAnimating(!isAnimating)}
     />
   );
+};
+
+const getSensorData = (sensorStr, sensorData) => {
+  var data = null;
+  const sensorList = Object.keys(sensorData);
+  sensorList.forEach(sensor => {
+    if (sensor.includes(sensorStr)) {
+      data = sensorData[sensor];
+    }
+  });
+  return data;
 };
 
 export default ActVis;
